@@ -1,9 +1,9 @@
 import java.util.HashMap;
 import java.util.Map;
 
-public class IdentifierState {
-    private Map<String, Integer> identifiersCount = new HashMap<>();
-    private Map<Integer, Integer> identifiersLengthCount = new HashMap<>();
+public class ProjectIdentifiersState {
+    Map<String, Integer> identifiersCount = new HashMap<>();
+    Map<Integer, Integer> identifiersLengthCount = new HashMap<>();
 
     public void addIdentifierUse(String identifier) {
         identifiersCount.merge(identifier, 1, Integer::sum);
