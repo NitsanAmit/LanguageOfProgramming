@@ -1,26 +1,26 @@
 import com.github.javaparser.ParseProblemException;
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.visitor.GenericVisitor;
+import com.github.javaparser.ast.visitor.GenericVisitorAdapter;
 
 import java.io.*;
 
 public class JavaFileAnalyzer {
 
     public static void analyze(String path) {
-        TotalIdentifiersState state = new TotalIdentifiersState();
+        IdentifiersLog identifiersLog = new IdentifiersLog();
         File projectsRoot = new File(path);
         File[] projects = projectsRoot.listFiles(File::isDirectory);
         if (projects == null) return;
         for (File project : projects) {
-            ProjectIdentifiersState projectState = new ProjectIdentifiersState();
-            state.setProjectState(projectState);
-            compileProjectFiles(project, state);
-            AnalyzerResultsWriter.writeAnalyzerResults(state.getProjectState(), project.getName());
+            identifiersLog.setCurrentProject(project.getName());
+            compileProjectFiles(project, identifiersLog);
         }
-        AnalyzerResultsWriter.writeAnalyzerResults(state, "ALL");
+        AnalyzerResultsWriter.writeAnalyzerResults(identifiersLog);
     }
 
-    private static void compileProjectFiles(File root, TotalIdentifiersState state) {
+    private static void compileProjectFiles(File root, IdentifiersLog state) {
         File[] files = root.listFiles((f) -> f.getName().toLowerCase().endsWith(".java") || (f.isDirectory() && !f.getName().equals("test")));
         if (files == null) return;
         for (File file : files) {
@@ -33,7 +33,7 @@ public class JavaFileAnalyzer {
 
     }
 
-    private static void compileFile(File file, TotalIdentifiersState state) {
+    private static void compileFile(File file, IdentifiersLog state) {
         CompilationUnit cu;
         try {
             cu = StaticJavaParser.parse(file);
@@ -45,7 +45,7 @@ public class JavaFileAnalyzer {
             e.printStackTrace();
             return;
         }
-        IdentifierVisitor visitor = new IdentifierVisitor();
+        GenericVisitorAdapter<Void, IdentifiersLog> visitor = new IdentifiersVisitorV2();
         visitor.visit(cu, state);
     }
 
