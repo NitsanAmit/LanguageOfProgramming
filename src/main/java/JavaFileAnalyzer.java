@@ -1,7 +1,6 @@
 import com.github.javaparser.ParseProblemException;
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
-import com.github.javaparser.ast.visitor.GenericVisitor;
 import com.github.javaparser.ast.visitor.GenericVisitorAdapter;
 
 import java.io.*;
@@ -45,7 +44,7 @@ public class JavaFileAnalyzer {
             e.printStackTrace();
             return;
         }
-        GenericVisitorAdapter<Void, IdentifiersLog> visitor = new IdentifiersVisitorV2();
+        GenericVisitorAdapter<Void, IdentifiersLog> visitor = new IdentifiersVisitor();
         visitor.visit(cu, state);
     }
 
